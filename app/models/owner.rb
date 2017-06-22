@@ -1,11 +1,15 @@
-class Owner < ActiveRecord::Base
-  # TODO: add validations
+class Owner < ApplicationRecord
+    before_save :normalize_phone_number
 
-  before_save :normalize_phone_number
+    validates :first_name, :last_name, :email, presence: true, length: {maximum: 255}
 
-  # removes leading 1 and the characters (, ), -, .
-  def normalize_phone_number
-    # stretch
-  end
+    validates :email, uniqueness: true, format: { with: /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/ }
 
+    def normalize_phone_number
+        if phone.present?
+            phone.gsub!(/^1/, '')
+            phone.gsub!(/[()-.]/, '')
+        end
+    end
+    
 end
